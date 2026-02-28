@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
+import swervelib.SwerveModule;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +23,10 @@ public class SwerveSubsystem extends SubsystemBase {
             // Load JSON configs from deploy/swerve
             File configDir = new File(Filesystem.getDeployDirectory(), "swerve");
             tempDrive = new SwerveParser(configDir).createSwerveDrive(5.0); // max 5 m/s
+
+            for (var module : tempDrive.getModules()) {
+    System.out.println(module.configuration.name + " offset: " + module.getAbsolutePosition());
+}
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to load swerve JSON configs!", e);
@@ -66,30 +71,6 @@ public void periodic() {
     // Update odometry (existing)
     swerveDrive.updateOdometry();
 
-    // ===== DEBUG: Print all module absolute angles =====
-    swervelib.SwerveModule[] modules = swerveDrive.getModules();
-    for (int i = 0; i < modules.length; i++) {
-        double absAngle = modules[i].getAbsolutePosition();
-        double relAngle = modules[i].getRelativePosition();
-        System.out.println(
-            "Module " + i + " abs: " + absAngle + "°, rel: " + relAngle + "°"
-        );
-   
     }
-
-
-
-    
-
-    
 }
-public void printAbsoluteEncoders() {
-    swervelib.SwerveModule[] modules = swerveDrive.getModules();
-    System.out.println("\n===== ABSOLUTE ENCODER RAW VALUES =====");
-    for (int i = 0; i < modules.length; i++) {
-        double absolutePosition = modules[i].getAbsolutePosition();
-        System.out.printf("Module %d: %.3f degrees\n", i, absolutePosition);
-    }
-    System.out.println("=======================================\n");
-}
-}
+

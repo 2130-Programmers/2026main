@@ -2,6 +2,8 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.IntakePivotSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +17,8 @@ public class RobotContainer {
     // Subsystems
     public final SwerveSubsystem swerve = new SwerveSubsystem();
     public final LauncherSubsystem launcher = new LauncherSubsystem();
-
+    public final IntakeSubsystem intake = new IntakeSubsystem();
+    public final IntakePivotSubsystem pivot = new IntakePivotSubsystem();
     // Controller
     private final CommandXboxController m_driverController =
             new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -47,13 +50,11 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // A button: Print encoder values for calibration
-        m_driverController.a().onTrue(
-            Commands.runOnce(() -> swerve.printAbsoluteEncoders())
-        );
+        // A button: pivoty
+         m_driverController.a().onTrue(new InstantCommand(pivot::toggle, pivot));
 
         // B button: Keep your existing code or remove if not needed
-        m_driverController.b().onTrue(new InstantCommand(() -> System.out.println("B button pressed!")));
+         m_driverController.b().onTrue(new InstantCommand(intake::toggle, intake));
 
         // X button: Toggle launcher on/off
         m_driverController.x().onTrue(new InstantCommand(launcher::toggle, launcher));
