@@ -44,7 +44,7 @@ public class RobotContainer {
                 rot    *= Math.PI * 0.6; // slow rotation a bit
 
                 // IMPORTANT: true = ROBOT-ORIENTED (safe with no gyro)
-                swerve.drive(xSpeed, ySpeed, rot, true);
+                swerveDrive.drive(xSpeed, ySpeed, rot, true);
             }, swerve)
         );
     }
@@ -63,10 +63,10 @@ public class RobotContainer {
     /**
      * Autonomous command placeholder
      */
-    public Command getAutonomousCommand() {
-        return null; // Implement your autonomous here
-    }
-
+   public Command getAutonomousCommand() {
+    return swerve.getAutonomousCommand("New Auto"); // use `swerve`, not `drivebase`
+}
+    
     public SwerveSubsystem getSwerve() {
         return swerve;
     }
