@@ -6,8 +6,10 @@ import frc.robot.subsystems.IntakePivotSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -44,7 +46,7 @@ public class RobotContainer {
                 rot    *= Math.PI * 0.6; // slow rotation a bit
 
                 // IMPORTANT: true = ROBOT-ORIENTED (safe with no gyro)
-                swerveDrive.drive(xSpeed, ySpeed, rot, true);
+                swerve.drive(xSpeed, ySpeed, rot, true);
             }, swerve)
         );
     }
@@ -64,7 +66,7 @@ public class RobotContainer {
      * Autonomous command placeholder
      */
    public Command getAutonomousCommand() {
-    return swerve.getAutonomousCommand("New Auto"); // use `swerve`, not `drivebase`
+    return new PathPlannerAuto("New Auto");
 }
     
     public SwerveSubsystem getSwerve() {

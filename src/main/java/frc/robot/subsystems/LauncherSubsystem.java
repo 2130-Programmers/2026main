@@ -18,8 +18,8 @@ public class LauncherSubsystem extends SubsystemBase {
 
     // CAN IDs – change to match your robot
     private static final int TOP_MOTOR_ID  = 13;
-    private static final int TOP_MOTOR_ID2  = 19;
-    private static final int BOTTOM_MOTOR_ID = 14;
+    private static final int TOP_MOTOR_ID2  = 14;
+    private static final int BOTTOM_MOTOR_ID = 19;
     private static final int BOTTOM_MOTOR_ID2 = 18;
 
 
@@ -67,10 +67,10 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public void start() {
-        topMotor.set(LAUNCHER_SPEED);
+        topMotor.set(LAUNCHER_SPEED*-1);
         topMotor2.set(LAUNCHER_SPEED);
 
-        bottomMotor.set(LAUNCHER_SPEED*LAUNCHER_Ratio);
+        bottomMotor.set(LAUNCHER_SPEED*LAUNCHER_Ratio*-1);
         bottomMotor2.set(LAUNCHER_SPEED*LAUNCHER_Ratio);
         isRunning = true;
     }
