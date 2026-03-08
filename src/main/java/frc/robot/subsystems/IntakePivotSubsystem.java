@@ -18,7 +18,7 @@ public class IntakePivotSubsystem extends SubsystemBase {
     public static final double GEAR_RATIO              = 25.0;          // 25:1 gearbox
 
     // 60 degrees = 60/360 = 0.1667 output shaft rotations
-    public static final double TARGET_OUTPUT_ROTATIONS = 50.0 / 360.0; // ~0.1667 output shaft rotations for 60°
+    public static final double TARGET_OUTPUT_ROTATIONS = 90.0 / 360.0; // ~0.1667 output shaft rotations for 60°
 
     // Encoder stabilization for gravity-drop zeroing:
     // If the encoder delta stays below STABLE_THRESHOLD for STABLE_TIME seconds, we've settled at bottom.
@@ -43,8 +43,8 @@ public class IntakePivotSubsystem extends SubsystemBase {
     private double stableTimer         = 0.0;
 
     // Brief push to break balance before releasing to gravity
-    public static final double PUSH_SPEED    = 0.15;  // Downward nudge power — TUNE THIS
-    public static final double PUSH_DURATION = 0.09; // Seconds to push      — TUNE THIS
+    public static final double PUSH_SPEED    = 0.1;  // Downward nudge power — TUNE THIS
+    public static final double PUSH_DURATION = 0.27; // Seconds to push      — TUNE THIS
     private double pushTimer = 0.0;
 
     // After startup zero, return to top

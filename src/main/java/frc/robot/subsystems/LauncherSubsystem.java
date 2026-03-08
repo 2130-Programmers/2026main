@@ -11,69 +11,87 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LauncherSubsystem extends SubsystemBase {
 
-    // ── Top-level tuning variables ──────────────────────────────────────
-    public static final double LAUNCHER_SPEED = .5;// 0.0 to 1.0
-    public static final double LAUNCHER_Ratio = 2;//1:Launcher_Ratio
-    // ───────────────────────────────────────────────────────────────────
+    // ── Baseline (calibrated at BASELINE_DIST_FT) ───────────────────────
+    public static final double BASELINE_DIST_FT  = 10.0;
+    public static final double BASELINE_SPEED    = 0.55;
+    public static final double BASELINE_RATIO    = 2.0;
 
-    // CAN IDs – change to match your robot
-    private static final int TOP_MOTOR_ID  = 13;
-    private static final int TOP_MOTOR_ID2  = 14;
-    private static final int BOTTOM_MOTOR_ID = 19;
+    // ── Side balance correction ──────────────────────────────────────────
+    // Right side is stronger — reduce it until both sides feel equal.
+    // 1.0 = no correction, 0.9 = right runs at 90% of left
+    public static final double RIGHT_TRIM = 0.9;
+
+    // ── Speed scaling ────────────────────────────────────────────────────
+    public static final double SPEED_PER_FOOT    = 0.025;
+    public static final double MIN_SPEED         = 0.3;
+    public static final double MAX_SPEED         = 1.0;
+
+    // ── Ratio scaling ────────────────────────────────────────────────────
+    public static final double RATIO_PER_FOOT    = 0.05;
+    public static final double MIN_RATIO         = 1.0;
+    public static final double MAX_RATIO         = 4.0;
+
+    // ── Distance clamp ───────────────────────────────────────────────────
+    public static final double MIN_DIST_FT       = 5.0;
+    public static final double MAX_DIST_FT       = 25.0;
+
+    private static final int TOP_MOTOR_ID     = 13;
+    private static final int TOP_MOTOR_ID2    = 14;
+    private static final int BOTTOM_MOTOR_ID  = 19;
     private static final int BOTTOM_MOTOR_ID2 = 18;
 
-
     private final SparkMax topMotor;
-    private final SparkMax bottomMotor;
-
-
     private final SparkMax topMotor2;
+    private final SparkMax bottomMotor;
     private final SparkMax bottomMotor2;
 
-    private boolean isRunning = false;
+    private TargetLockSubsystem targetLock = null;
+
+    private boolean isRunning   = false;
+    private double  currentDist = BASELINE_DIST_FT;
 
     @SuppressWarnings("removal")
     public LauncherSubsystem() {
-        topMotor  = new SparkMax(TOP_MOTOR_ID,  MotorType.kBrushless);
-        bottomMotor = new SparkMax(BOTTOM_MOTOR_ID, MotorType.kBrushless);
-
-        topMotor2  = new SparkMax(TOP_MOTOR_ID2,  MotorType.kBrushless);
+        topMotor     = new SparkMax(TOP_MOTOR_ID,     MotorType.kBrushless);
+        topMotor2    = new SparkMax(TOP_MOTOR_ID2,    MotorType.kBrushless);
+        bottomMotor  = new SparkMax(BOTTOM_MOTOR_ID,  MotorType.kBrushless);
         bottomMotor2 = new SparkMax(BOTTOM_MOTOR_ID2, MotorType.kBrushless);
 
-
-
-        // Configure left motor
         SparkMaxConfig leftConfig = new SparkMaxConfig();
-        leftConfig.idleMode(IdleMode.kCoast)
-        .inverted(true);
-        topMotor.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftConfig.idleMode(IdleMode.kCoast).inverted(true);
+        topMotor.configure(leftConfig,  ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         topMotor2.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        // Configure right motor (inverted to run in same direction)
+
         SparkMaxConfig rightConfig = new SparkMaxConfig();
-        rightConfig
-            .idleMode(IdleMode.kCoast)
-            .inverted(false);
-        bottomMotor.configure(rightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightConfig.idleMode(IdleMode.kCoast).inverted(false);
+        bottomMotor.configure(rightConfig,  ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         bottomMotor2.configure(rightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    /** Toggle the launcher on/off at LAUNCHER_SPEED. */
+    public void setTargetLock(TargetLockSubsystem targetLock) {
+        this.targetLock = targetLock;
+    }
+
+    public void setDistance(double distFeet) {
+        currentDist = Math.max(MIN_DIST_FT, Math.min(MAX_DIST_FT, distFeet));
+    }
+
+    private double computeSpeed() {
+        double delta = currentDist - BASELINE_DIST_FT;
+        return Math.max(MIN_SPEED, Math.min(MAX_SPEED, BASELINE_SPEED + (delta * SPEED_PER_FOOT)));
+    }
+
+    private double computeRatio() {
+        double delta = currentDist - BASELINE_DIST_FT;
+        return Math.max(MIN_RATIO, Math.min(MAX_RATIO, BASELINE_RATIO + (delta * RATIO_PER_FOOT)));
+    }
+
     public void toggle() {
-        if (isRunning) {
-            stop();
-        } else {
-            start();
-        }
+        if (isRunning) stop();
+        else start();
     }
 
-    public void start() {
-        topMotor.set(LAUNCHER_SPEED*-1);
-        topMotor2.set(LAUNCHER_SPEED);
-
-        bottomMotor.set(LAUNCHER_SPEED*LAUNCHER_Ratio*-1);
-        bottomMotor2.set(LAUNCHER_SPEED*LAUNCHER_Ratio);
-        isRunning = true;
-    }
+    public void start() { isRunning = true; }
 
     public void stop() {
         topMotor.set(0);
@@ -83,12 +101,23 @@ public class LauncherSubsystem extends SubsystemBase {
         isRunning = false;
     }
 
-    public boolean isRunning() {
-        return isRunning;
-    }
+    public boolean isRunning() { return isRunning; }
 
     @Override
     public void periodic() {
-        // Add SmartDashboard telemetry here if desired
+        if (targetLock != null && targetLock.hasTarget()) {
+            setDistance(targetLock.getDistanceFeet());
+        }
+
+        double speed = computeSpeed();
+        double ratio = computeRatio();
+
+        if (isRunning) {
+            // topMotor/topMotor2 = left side, bottomMotor/bottomMotor2 = right side
+            topMotor.set(speed * -1);
+            topMotor2.set(speed);
+            bottomMotor.set(speed * ratio * RIGHT_TRIM * -1);
+            bottomMotor2.set(speed * ratio * RIGHT_TRIM);
+        }
     }
 }
