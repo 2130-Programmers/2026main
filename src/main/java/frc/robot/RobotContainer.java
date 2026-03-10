@@ -56,7 +56,7 @@ public class RobotContainer {
                 if (targetLock.isLocked()) {
                     rot = targetLock.getRotationSpeed();
                 } else {
-                    rot *= Math.PI * 0.6;
+                    rot *= Math.PI * 1.0;
                 }
 
                 swerve.drive(xSpeed, ySpeed, rot, true);

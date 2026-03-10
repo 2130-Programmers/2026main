@@ -5,14 +5,14 @@
       "factor": 0
     },
     "drive": {
-      "gearRatio": 8.14,
-      "diameter": 4,
+      "gearRatio": 6.75,
+      "diameter": 3.9,
       "factor": 0
     }
   },
   "currentLimit": {
-    "drive": 40,
-    "angle": 20
+    "drive": 35,
+    "angle": 15
   },
   "rampRate": {
     "drive": 0.25,

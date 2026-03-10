@@ -44,7 +44,7 @@ import java.util.List;
 public class TargetLockSubsystem extends SubsystemBase {
 
     // ── Valid AprilTag IDs ────────────────────────────────────────────────────
-    private static final List<Integer> VALID_TAG_IDS = List.of(26, 10);
+    private static final List<Integer> VALID_TAG_IDS = List.of(26, 10,2,8,21,18);
 
     // ── PID ───────────────────────────────────────────────────────────────────
     private static final double kP             = 0.04;
@@ -188,17 +188,17 @@ public class TargetLockSubsystem extends SubsystemBase {
         }
 
         if (ENABLE_DASHBOARD) {
-            SmartDashboard.putBoolean("TargetLock/Locked",          locked);
-            SmartDashboard.putBoolean("TargetLock/HasTarget",        hasTarget);
-            SmartDashboard.putBoolean("TargetLock/AtSetpoint",       rotController.atSetpoint());
-            SmartDashboard.putNumber ("TargetLock/CameraYaw_deg",    dbCameraYaw);
-            SmartDashboard.putNumber ("TargetLock/HeadingError_deg", dbHeadingError);
-            SmartDashboard.putNumber ("TargetLock/Distance_ft",      dbDistanceFeet);
-            SmartDashboard.putNumber ("TargetLock/AimX_in",          dbAimX);
-            SmartDashboard.putNumber ("TargetLock/AimY_in",          dbAimY);
-            SmartDashboard.putNumber ("TargetLock/WallNormal_X",     dbWallNx);
-            SmartDashboard.putNumber ("TargetLock/WallNormal_Y",     dbWallNy);
-            SmartDashboard.putNumber ("TargetLock/Output_radps",     rotationSpeed);
+            SmartDashboard.putBoolean("Locked",          locked);
+            SmartDashboard.putBoolean("HasTarget",        hasTarget);
+            SmartDashboard.putBoolean("AtSetpoint",       rotController.atSetpoint());
+            SmartDashboard.putNumber ("CameraYaw_deg",    dbCameraYaw);
+            SmartDashboard.putNumber ("HeadingError_deg", dbHeadingError);
+            SmartDashboard.putNumber ("Distance_ft",      dbDistanceFeet);
+            SmartDashboard.putNumber ("AimX_in",          dbAimX);
+            SmartDashboard.putNumber ("AimY_in",          dbAimY);
+            SmartDashboard.putNumber ("WallNormal_X",     dbWallNx);
+            SmartDashboard.putNumber ("WallNormal_Y",     dbWallNy);
+            SmartDashboard.putNumber ("Output_radps",     rotationSpeed);
         }
     }
 

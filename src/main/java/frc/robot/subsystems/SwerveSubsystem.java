@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
@@ -117,7 +118,14 @@ public void setupPathPlanner()
     // Create a path following command using AutoBuilder. This will also trigger event markers.
     return new PathPlannerAuto(pathName);
   }
-
+@Override
+public void periodic() {
+    SmartDashboard.putNumber("Pose X", swerveDrive.getPose().getX());
+    SmartDashboard.putNumber("Pose Y", swerveDrive.getPose().getY());
+    SmartDashboard.putNumber("Pose Rotation", swerveDrive.getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("Velocity X", swerveDrive.getRobotVelocity().vxMetersPerSecond);
+    SmartDashboard.putNumber("Velocity Y", swerveDrive.getRobotVelocity().vyMetersPerSecond);
+}
 
 
   
