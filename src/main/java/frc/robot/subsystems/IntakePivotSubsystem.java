@@ -14,60 +14,59 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakePivotSubsystem extends SubsystemBase {
 
     // ── Tuning Variables ────────────────────────────────────────────────
-    public static final double PIVOT_SPEED             = 0.15;          // Speed going UP               — TUNE SIGN/MAGNITUDE
-    public static final double GEAR_RATIO              = 25.0;          // 25:1 gearbox
+    public static final double PIVOT_SPEED      = 0.15;
+    public static final double MANUAL_SPEED     = 0.15; // TUNE THIS
+    public static final double GEAR_RATIO       = 25.0;
 
-    // 60 degrees = 60/360 = 0.1667 output shaft rotations
-    public static final double TARGET_OUTPUT_ROTATIONS = 93.0 / 360.0; // ~0.1667 output shaft rotations for 60°
+    public static final double STABLE_THRESHOLD = 0.01;
+    public static final double STABLE_TIME      = 0.15;
 
-    // Encoder stabilization for gravity-drop zeroing:
-    // If the encoder delta stays below STABLE_THRESHOLD for STABLE_TIME seconds, we've settled at bottom.
-    public static final double STABLE_THRESHOLD        = 0.01;          // Motor rotations per loop considered "not moving" — TUNE THIS
-    public static final double STABLE_TIME             = 0.15;          // Seconds of stability required to confirm bottom  — TUNE THIS
+    public static final double PUSH_SPEED       = 0.1;
+    public static final double PUSH_DURATION    = 0.9;
     // ───────────────────────────────────────────────────────────────────
 
     private static final int LEFT_MOTOR_ID  = 16;
     private static final int RIGHT_MOTOR_ID = 17;
 
-    private static final double PERIODIC_DT = 0.02; // 20ms loop
+    private static final double PERIODIC_DT = 0.02;
 
     private final SparkMax leftMotor;
     private final SparkMax rightMotor;
     private final RelativeEncoder encoder;
 
+    private double targetDegrees;
+    private double targetOutputRotations;
+
     private double zeroPositionMotorRotations = 0.0;
     private boolean isZeroed = false;
 
-    // Gravity-drop stabilization tracking
     private double lastEncoderPosition = 0.0;
     private double stableTimer         = 0.0;
+    private double pushTimer           = 0.0;
 
-    // Brief push to break balance before releasing to gravity
-    public static final double PUSH_SPEED    = 0.1;  // Downward nudge power — TUNE THIS
-    public static final double PUSH_DURATION = 0.9; // Seconds to push      — TUNE THIS
-    private double pushTimer = 0.0;
-
-    // After startup zero, return to top
     private boolean returnToTopAfterZero = true;
 
     public enum PivotState {
-        AT_BOTTOM,  // Resting at physical bottom stop, zeroed
-        MOVING_UP,  // Driving up toward 60° position
-        AT_TOP,     // Holding at top (brake mode)
-        ZEROING     // Motors released — falling via gravity, watching encoder to stabilize
+        AT_BOTTOM,
+        MOVING_UP,
+        AT_TOP,
+        ZEROING,
+        MANUAL  // ← new
     }
 
-    // Robot assumed to start in UP position
-    private PivotState currentState = PivotState.AT_TOP;
+    private PivotState currentState  = PivotState.AT_TOP;
+    private PivotState stateBeforeManual = PivotState.AT_TOP; // restore after manual
 
     @SuppressWarnings("removal")
-    public IntakePivotSubsystem() {
+    public IntakePivotSubsystem(double targetDegrees) {
+        this.targetDegrees         = targetDegrees;
+        this.targetOutputRotations = targetDegrees / 360.0;
+
         leftMotor  = new SparkMax(LEFT_MOTOR_ID,  MotorType.kBrushless);
         rightMotor = new SparkMax(RIGHT_MOTOR_ID, MotorType.kBrushless);
 
         encoder = leftMotor.getEncoder();
 
-        // Motors inverted opposite to each other (flipped from before)
         SparkMaxConfig leftConfig = new SparkMaxConfig();
         leftConfig.idleMode(IdleMode.kBrake).inverted(true);
         leftMotor.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -79,37 +78,22 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
     // ── Public API ──────────────────────────────────────────────────────
 
-    /**
-     * Toggle between UP and DOWN positions.
-     * Ignores calls while already moving or zeroing.
-     *
-     *   AT_TOP    → release motors, fall by gravity, zero when encoder stabilizes → AT_BOTTOM
-     *   AT_BOTTOM → drive up 60° → AT_TOP
-     */
     public void toggle() {
         switch (currentState) {
-
             case AT_TOP:
                 returnToTopAfterZero = false;
                 startZeroSequence();
                 break;
-
             case AT_BOTTOM:
                 currentState = PivotState.MOVING_UP;
                 break;
-
             case MOVING_UP:
             case ZEROING:
-                // Ignore while in motion
+            case MANUAL:
                 break;
         }
     }
 
-    /**
-     * Release motors and let gravity drop the pivot to bottom.
-     * Encoder stabilization detects when it has settled.
-     * Call on enable or after brownout — will return to top afterward.
-     */
     public void startZeroSequence() {
         stableTimer         = 0.0;
         pushTimer           = 0.0;
@@ -117,11 +101,48 @@ public class IntakePivotSubsystem extends SubsystemBase {
         currentState        = PivotState.ZEROING;
     }
 
+    public void setTargetDegrees(double degrees) {
+        this.targetDegrees         = degrees;
+        this.targetOutputRotations = degrees / 360.0;
+    }
+
+   /** Call while d-pad right is held. */
+ /** Call while d-pad right is held. */
+    public void manualForward() {
+        if (currentState != PivotState.MANUAL) {
+            stateBeforeManual = currentState;  // only save on first entry
+            currentState      = PivotState.MANUAL;
+        }
+        if (getOutputRotations() * 360.0 < 93.0) {
+            setMotors(MANUAL_SPEED);
+        } else {
+            stopMotors();
+        }
+    }
+
+    /** Call while d-pad left is held. */
+    public void manualReverse() {
+        if (currentState != PivotState.MANUAL) {
+            stateBeforeManual = currentState;  // only save on first entry
+            currentState      = PivotState.MANUAL;
+        }
+        if (getOutputRotations() * 360.0 > 0.0) {
+            setMotors(-MANUAL_SPEED);
+        } else {
+            stopMotors();
+        }
+    }
+    /** Call on d-pad release — stops motors and restores previous state. */
+    public void manualStop() {
+        stopMotors();
+        currentState = stateBeforeManual;
+    }
+
     public PivotState getState()      { return currentState; }
     public boolean isZeroed()         { return isZeroed; }
     public double getMotorRotations() { return encoder.getPosition(); }
+    public double getTargetDegrees()  { return targetDegrees; }
 
-    /** Output shaft rotations traveled upward from zero (bottom). */
     public double getOutputRotations() {
         return (encoder.getPosition() - zeroPositionMotorRotations) / GEAR_RATIO;
     }
@@ -140,42 +161,41 @@ public class IntakePivotSubsystem extends SubsystemBase {
                 break;
 
             case MOVING_UP:
-                if (Math.abs(outputRotations) >= TARGET_OUTPUT_ROTATIONS) {
+                if (Math.abs(outputRotations) >= targetOutputRotations) {
                     stopMotors();
                     currentState = PivotState.AT_TOP;
                 } else {
-                    setMotors(PIVOT_SPEED); // positive = up
+                    setMotors(PIVOT_SPEED);
                 }
                 break;
 
             case AT_TOP:
-                stopMotors(); // brake mode holds position passively
+                stopMotors();
+                break;
+
+            case MANUAL:
+                // Motors driven directly by manualForward/manualReverse — nothing to do here
                 break;
 
             case ZEROING:
-                // Phase 1: brief downward push to break balance point
                 if (pushTimer < PUSH_DURATION) {
                     setMotors(-PUSH_SPEED);
                     pushTimer += PERIODIC_DT;
-                    break; // skip stabilization check until push is done
+                    break;
                 }
 
-                // Phase 2: release to gravity — brake mode slows the fall
-                // and holds firmly once it reaches the physical stop.
                 stopMotors();
 
-                // Measure how much the encoder moved since last loop
                 double delta = Math.abs(currentPosition - lastEncoderPosition);
                 lastEncoderPosition = currentPosition;
 
                 if (delta < STABLE_THRESHOLD) {
-                    stableTimer += PERIODIC_DT; // encoder barely moving — accumulate stable time
+                    stableTimer += PERIODIC_DT;
                 } else {
-                    stableTimer = 0.0;          // still falling — reset
+                    stableTimer = 0.0;
                 }
 
                 if (stableTimer >= STABLE_TIME) {
-                    // Encoder stable long enough — we're at the bottom
                     zeroPositionMotorRotations = currentPosition;
                     isZeroed    = true;
                     stableTimer = 0.0;
@@ -192,7 +212,6 @@ public class IntakePivotSubsystem extends SubsystemBase {
                 break;
         }
 
-        // ── SmartDashboard Telemetry ──
         SmartDashboard.putString ("IntakePivot/State",           currentState.toString());
         SmartDashboard.putNumber ("IntakePivot/OutputRotations", outputRotations);
         SmartDashboard.putNumber ("IntakePivot/MotorRotations",  currentPosition);
@@ -200,7 +219,8 @@ public class IntakePivotSubsystem extends SubsystemBase {
         SmartDashboard.putNumber ("IntakePivot/PushTimer",       pushTimer);
         SmartDashboard.putBoolean("IntakePivot/IsZeroed",        isZeroed);
         SmartDashboard.putNumber ("IntakePivot/ZeroPoint",       zeroPositionMotorRotations);
-        SmartDashboard.putNumber ("IntakePivot/TargetRotations", TARGET_OUTPUT_ROTATIONS);
+        SmartDashboard.putNumber ("IntakePivot/TargetDegrees",   targetDegrees);
+        SmartDashboard.putNumber ("IntakePivot/TargetRotations", targetOutputRotations);
     }
 
     // ── Private Helpers ─────────────────────────────────────────────────

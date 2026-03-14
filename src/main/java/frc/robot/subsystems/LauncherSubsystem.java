@@ -13,7 +13,7 @@ public class LauncherSubsystem extends SubsystemBase {
 
     // ── Baseline (calibrated at BASELINE_DIST_FT) ───────────────────────
     public static final double BASELINE_DIST_FT  = 10.0;
-    public static final double BASELINE_SPEED    = 0.55;
+    public static final double BASELINE_SPEED    = 0.5;
     public static final double BASELINE_RATIO    = 2.0;
 
     // ── Side balance correction ──────────────────────────────────────────
@@ -67,12 +67,12 @@ public class LauncherSubsystem extends SubsystemBase {
         bottomMotor2 = new SparkMax(BOTTOM_MOTOR_ID2, MotorType.kBrushless);
 
         SparkMaxConfig leftConfig = new SparkMaxConfig();
-        leftConfig.idleMode(IdleMode.kCoast).inverted(true);
+        leftConfig.idleMode(IdleMode.kCoast).inverted(true).voltageCompensation(12.0);
         topMotor.configure(leftConfig,  ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         topMotor2.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         SparkMaxConfig rightConfig = new SparkMaxConfig();
-        rightConfig.idleMode(IdleMode.kCoast).inverted(false);
+        rightConfig.idleMode(IdleMode.kCoast).inverted(false).voltageCompensation(12.0);
         bottomMotor.configure(rightConfig,  ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         bottomMotor2.configure(rightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }

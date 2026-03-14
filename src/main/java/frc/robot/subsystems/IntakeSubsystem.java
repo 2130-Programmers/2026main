@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase {
 
     // ── Top-level tuning variables ──────────────────────────────────────
-    public static final double INTAKE_SPEED = 1.0; // 0.0 to 1.0
+    public static final double INTAKE_SPEED = .75; // 0.0 to 1.0
     
     // ───────────────────────────────────────────────────────────────────
 
@@ -27,6 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @SuppressWarnings("removal")
     public IntakeSubsystem() {
+        
         intakeMotor  = new SparkMax(INTAKE_MOTOR_ID,  MotorType.kBrushless);
         
 

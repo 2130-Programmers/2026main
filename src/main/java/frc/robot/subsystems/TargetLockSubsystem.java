@@ -11,36 +11,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import java.util.List;
 
-/**
- * TargetLockSubsystem
- *
- * Aims robot center at a point TARGET_DEPTH_IN inches BEHIND the AprilTag,
- * projected perpendicular to the wall using the tag's own facing direction.
- *
- * KEY FIXES:
- *   1. Camera offset applied to tag POSITION only — not to the wall normal.
- *   2. Wall normal derived from tag rotation MATRIX column 0, not Euler angles.
- *      getX/Y/Z() on Rotation3d returns roll/pitch/yaw — not axis direction vectors.
- *      toMatrix().get(0, 0) / get(1, 0) gives the actual tag X-axis direction in
- *      camera frame, which is the true perpendicular into the wall.
- *
- * CORRECT ORDER:
- *   1. Get tag position in camera frame (meters → inches)
- *   2. Shift to robot center frame (apply camera offsets to position only)
- *   3. Extract wall normal from rotation matrix column 0 (tag X-axis = into wall)
- *   4. Normalize the wall normal
- *   5. Project aim point: tag position + normal × TARGET_DEPTH_IN
- *   6. atan2(aimY, aimX) → heading error
- *   7. PID drives heading error → 0
- *
- * COORDINATE SYSTEM (WPILib 2026 / modern PhotonVision):
- *   +X = forward, +Y = left, +Z = up
- *
- * CAMERA_LATERAL_IN : positive = camera RIGHT of robot center, negative = LEFT
- * CAMERA_FORWARD_IN : positive = camera FORWARD of robot center, negative = BEHIND
- *
- * Camera is assumed to be aligned with robot front (no yaw rotation).
- */
 public class TargetLockSubsystem extends SubsystemBase {
 
     // ── Valid AprilTag IDs ────────────────────────────────────────────────────
@@ -114,28 +84,13 @@ public class TargetLockSubsystem extends SubsystemBase {
         if (locked && hasTarget) {
             double cameraYaw = validTarget.getYaw();
 
-            // ── Step 1: Tag position in camera frame (inches) ─────────────────
-            // Modern PhotonVision (2026): +X = forward, +Y = left, +Z = up
             Transform3d camToTag = validTarget.getBestCameraToTarget();
             double tagX_cam = camToTag.getTranslation().getX() * 39.3701;
             double tagY_cam = camToTag.getTranslation().getY() * 39.3701;
 
-            // ── Step 2: Shift to robot center frame ───────────────────────────
-            // Apply camera offsets to tag POSITION only.
-            // The wall normal is derived from the tag's rotation and must NOT
-            // have positional offsets mixed in.
             double tagX_robot = tagX_cam + CAMERA_FORWARD_IN;
             double tagY_robot = tagY_cam - CAMERA_LATERAL_IN;
 
-            // ── Step 3: Wall normal from tag rotation matrix ──────────────────
-            // CRITICAL: Rotation3d.getX/Y/Z() returns Euler angles (roll/pitch/yaw),
-            // NOT direction vectors of the tag's axes. Using those as a direction
-            // vector produces a wrong normal, causing the robot to turn away when
-            // any camera offset is present.
-            //
-            // toMatrix() column 0 = where the tag's +X axis points in camera frame.
-            // In PhotonVision the tag +X axis points INTO the wall (away from camera),
-            // giving the true wall normal regardless of robot approach angle.
             var rotMatrix = camToTag.getRotation().toMatrix();
             double rx = rotMatrix.get(0, 0); // tag X projected onto camera/robot forward
             double ry = rotMatrix.get(1, 0); // tag X projected onto camera/robot left
@@ -156,18 +111,11 @@ public class TargetLockSubsystem extends SubsystemBase {
                 ry /= nLen;
             }
 
-            // ── Step 4: Aim point behind the tag, perpendicular to wall ───────
-            // Tag position + wall normal × depth = point TARGET_DEPTH_IN inches
-            // directly behind the tag face into the wall.
-            // Because the normal comes from tag rotation, this stays fixed on the
-            // wall regardless of what angle the robot is approaching from.
             double aimX = tagX_robot + rx * TARGET_DEPTH_IN;
             double aimY = tagY_robot + ry * TARGET_DEPTH_IN;
 
-            // ── Step 5: Heading error ─────────────────────────────────────────
             double headingError = Math.toDegrees(Math.atan2(aimY, aimX));
 
-            // ── Step 6: PID → rotation output ────────────────────────────────
             double output = rotController.calculate(headingError, 0.0);
             output = Math.max(-1.0, Math.min(1.0, output)) * MAX_ROT_OUTPUT;
             if (INVERT_OUTPUT)    output = -output;
