@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -32,15 +35,22 @@ public void robotPeriodic() {
 
   @Override
   public void disabledPeriodic() {}
-
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
-    }
+      Command auto = m_robotContainer.getAutonomousCommand();
+      
+      // Reset pose to match path start
+      if (auto instanceof PathPlannerAuto) {
+          m_robotContainer.getSwerve().resetOdometry(
+              ((PathPlannerAuto) auto).getStartingPose()
+          );
+      }
+      
+      m_autonomousCommand = auto;
+      if (m_autonomousCommand != null) {
+          CommandScheduler.getInstance().schedule(m_autonomousCommand);
+      }
   }
-
   @Override
   public void autonomousPeriodic() {}
 

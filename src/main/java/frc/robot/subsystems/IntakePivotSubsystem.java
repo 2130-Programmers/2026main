@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakePivotSubsystem extends SubsystemBase {
 
     // ── Tuning Variables ────────────────────────────────────────────────
-    public static final double PIVOT_SPEED      = 0.15;
-    public static final double MANUAL_SPEED     = 0.15; // TUNE THIS
+    public static final double PIVOT_SPEED      = 0.22;
+    public static final double MANUAL_SPEED     = 0.3; // TUNE THIS
     public static final double GEAR_RATIO       = 25.0;
 
     public static final double STABLE_THRESHOLD = 0.01;

@@ -12,10 +12,9 @@ import org.photonvision.PhotonCamera;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
@@ -63,7 +62,7 @@ public class RobotContainer {
         // A button: pivot toggle at default 93°
         m_driverController.a().onTrue(
             new InstantCommand(() -> {
-                pivot.setTargetDegrees(93.0);
+                pivot.setTargetDegrees(94.5);
                 pivot.toggle();
             }, pivot)
         );
@@ -91,7 +90,7 @@ public class RobotContainer {
         m_driverController.y().onTrue(new InstantCommand(targetLock::toggleLock));
     }
 
-    public Command getAutonomousCommand() {
+    public PathPlannerAuto getAutonomousCommand() {
         return new PathPlannerAuto("New Auto");
     }
 

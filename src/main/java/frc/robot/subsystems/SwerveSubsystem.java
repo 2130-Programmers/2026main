@@ -14,7 +14,8 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.math.geometry.Pose2d;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,9 +25,10 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrive swerveDrive;
 
     public SwerveSubsystem() {
+
         try {
             File configDir = new File(Filesystem.getDeployDirectory(), "swerve");
-            swerveDrive = new SwerveParser(configDir).createSwerveDrive(5.0); // max 5 m/s
+            swerveDrive = new SwerveParser(configDir).createSwerveDrive(3.0); // max 5 m/s
 
             for (var module : swerveDrive.getModules()) {
                 System.out.println(module.configuration.name + " offset: " + module.getAbsolutePosition());
@@ -40,6 +42,11 @@ public class SwerveSubsystem extends SubsystemBase {
       /**
    * Setup AutoBuilder for PathPlanner.
    */
+
+
+public void resetOdometry(Pose2d pose) {
+    swerveDrive.resetOdometry(pose);
+}
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative)
 {
     ChassisSpeeds speeds = fieldRelative
@@ -50,6 +57,7 @@ public class SwerveSubsystem extends SubsystemBase {
 }
 public void setupPathPlanner()
 {
+    
     System.out.println(">>> setupPathPlanner START");
     RobotConfig config;
     try
@@ -86,7 +94,7 @@ public void setupPathPlanner()
             },
             new PPHolonomicDriveController(
                 new PIDConstants(5.0, 0.0, 0.0),
-                new PIDConstants(5.0, 0.0, 0.0)
+                new PIDConstants(0.0, 0.0, 0.0)
             ),
             config,
             () -> {
@@ -118,6 +126,18 @@ public void setupPathPlanner()
     // Create a path following command using AutoBuilder. This will also trigger event markers.
     return new PathPlannerAuto(pathName);
   }
+
+
+
+
+private final ADXRS450_Gyro imu = new ADXRS450_Gyro();
+
+// in periodic:
+
+
+
+
+
 @Override
 public void periodic() {
     SmartDashboard.putNumber("Pose X", swerveDrive.getPose().getX());
@@ -125,6 +145,17 @@ public void periodic() {
     SmartDashboard.putNumber("Pose Rotation", swerveDrive.getPose().getRotation().getDegrees());
     SmartDashboard.putNumber("Velocity X", swerveDrive.getRobotVelocity().vxMetersPerSecond);
     SmartDashboard.putNumber("Velocity Y", swerveDrive.getRobotVelocity().vyMetersPerSecond);
+    SmartDashboard.putNumber("IMU Yaw", swerveDrive.getYaw().getDegrees());
+    SmartDashboard.putNumber("Direct IMU Yaw", imu.getAngle());
+
+    SmartDashboard.putNumber("Actual Speed", 
+    Math.hypot(
+        swerveDrive.getRobotVelocity().vxMetersPerSecond,
+        swerveDrive.getRobotVelocity().vyMetersPerSecond
+    )
+);
+
+
 }
 
 

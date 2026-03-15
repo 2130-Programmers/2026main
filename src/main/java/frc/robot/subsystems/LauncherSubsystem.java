@@ -19,7 +19,7 @@ public class LauncherSubsystem extends SubsystemBase {
     // ── Side balance correction ──────────────────────────────────────────
     // Right side is stronger — reduce it until both sides feel equal.
     // 1.0 = no correction, 0.9 = right runs at 90% of left
-    public static final double RIGHT_TRIM = 0.95;
+    public static final double RIGHT_TRIM = 0.96;
 
     // ── Speed scaling ────────────────────────────────────────────────────
     public static final double SPEED_PER_FOOT    = 0.01;
@@ -37,12 +37,12 @@ public class LauncherSubsystem extends SubsystemBase {
 
     // ── Close-range exponential boost ───────────────────────────────────
     // When below BASELINE_DIST_FT, apply an extra exponential pull-down
-    // on speed and ratio so close shots don't overshoot.
+    // on speed and ratio so close shots don't overshoot+.
     // Increase CLOSE_CURVE_STRENGTH to make the dip more aggressive.
     public static final double CLOSE_RANGE_THRESHOLD = BASELINE_DIST_FT; // feet
     public static final double CLOSE_CURVE_STRENGTH  = 0.04; // tune this (higher = more aggressive dip)
     // Overall scalar on the close-range correction: 0.0 = no correction, 1.0 = full, >1.0 = extra aggressive
-    public static final double CLOSE_CORRECTION_SCALE = 0.17;
+    public static final double CLOSE_CORRECTION_SCALE = 0.0;
 
     private static final int TOP_MOTOR_ID     = 13;
     private static final int TOP_MOTOR_ID2    = 14;
