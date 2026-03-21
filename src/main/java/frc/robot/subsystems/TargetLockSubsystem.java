@@ -17,7 +17,7 @@ public class TargetLockSubsystem extends SubsystemBase {
     private static final List<Integer> VALID_TAG_IDS = List.of(26, 10,2,8,21,18);
 
     // ── PID ───────────────────────────────────────────────────────────────────
-    private static final double kP             = 0.04;
+    private static final double kP             = 0.03;
     private static final double kI             = 0.0;
     private static final double kD             = 0.001;
     private static final double TOLERANCE_DEG  = 1.5;
@@ -80,6 +80,18 @@ public class TargetLockSubsystem extends SubsystemBase {
             }
         }
         hasTarget = (validTarget != null);
+        if (hasTarget) {
+            Transform3d camToTag = validTarget.getBestCameraToTarget();
+            double tagX_cam = camToTag.getTranslation().getX() * 39.3701;
+            double tagY_cam = camToTag.getTranslation().getY() * 39.3701;
+            double tagX_robot = tagX_cam + CAMERA_FORWARD_IN;
+            double tagY_robot = tagY_cam - CAMERA_LATERAL_IN;
+            dbDistanceFeet = Math.hypot(tagX_robot, tagY_robot) / 12.0;
+        } else {
+            dbDistanceFeet = -1.0;
+        }
+
+
 
         if (locked && hasTarget) {
             double cameraYaw = validTarget.getYaw();
@@ -124,7 +136,6 @@ public class TargetLockSubsystem extends SubsystemBase {
             rotationSpeed  = rotController.atSetpoint() ? 0.0 : output;
             dbCameraYaw    = cameraYaw;
             dbHeadingError = headingError;
-            dbDistanceFeet = tagX_robot / 12.0;
             dbAimX         = aimX;
             dbAimY         = aimY;
             dbWallNx       = rx;

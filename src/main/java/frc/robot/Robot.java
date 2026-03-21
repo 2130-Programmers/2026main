@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -37,6 +38,8 @@ public void robotPeriodic() {
   public void disabledPeriodic() {}
   @Override
   public void autonomousInit() {
+   
+     m_robotContainer.pivot.resetToTop();
       Command auto = m_robotContainer.getAutonomousCommand();
       
       // Reset pose to match path start
@@ -55,7 +58,14 @@ public void robotPeriodic() {
   public void autonomousPeriodic() {}
 
   @Override
+    public void robotInit() {
+        // already handled by constructor but add this:
+        System.out.println("Named commands: " + NamedCommands.getCommand("PivotToggle"));
+    }
+  @Override
   public void teleopInit() {
+  
+    m_robotContainer.pivot.resetToTop();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

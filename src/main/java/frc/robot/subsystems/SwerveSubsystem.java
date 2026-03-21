@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,8 +14,9 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,12 +24,14 @@ import java.io.IOException;
 public class SwerveSubsystem extends SubsystemBase {
 
     private final SwerveDrive swerveDrive;
-
     public SwerveSubsystem() {
-
         try {
             File configDir = new File(Filesystem.getDeployDirectory(), "swerve");
-            swerveDrive = new SwerveParser(configDir).createSwerveDrive(3.0); // max 5 m/s
+            swerveDrive = new SwerveParser(configDir).createSwerveDrive(4.5);
+
+            // ✅ Use gyro for rotation, wheel encoders for translation
+            swerveDrive.setHeadingCorrection(true);  // Corrects heading drift using gyro
+            swerveDrive.setCosineCompensator(true);   // Smoother wheel control
 
             for (var module : swerveDrive.getModules()) {
                 System.out.println(module.configuration.name + " offset: " + module.getAbsolutePosition());
@@ -42,7 +45,13 @@ public class SwerveSubsystem extends SubsystemBase {
       /**
    * Setup AutoBuilder for PathPlanner.
    */
+public void zeroGyro() {
+    swerveDrive.zeroGyro();
+}
 
+public Rotation2d getHeading() {
+    return swerveDrive.getYaw(); // Pure gyro reading
+}
 
 public void resetOdometry(Pose2d pose) {
     swerveDrive.resetOdometry(pose);
@@ -73,38 +82,21 @@ public void setupPathPlanner()
 
     try
     {
-        final boolean enableFeedforward = true;
+        
         System.out.println(">>> Calling AutoBuilder.configure");
         AutoBuilder.configure(
             swerveDrive::getPose,
             swerveDrive::resetOdometry,
             swerveDrive::getRobotVelocity,
             (speedsRobotRelative, moduleFeedForwards) -> {
-                if (enableFeedforward)
-                {
-                    swerveDrive.drive(
-                        speedsRobotRelative,
-                        swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
-                        moduleFeedForwards.linearForces()
-                    );
-                } else
-                {
-                    swerveDrive.setChassisSpeeds(speedsRobotRelative);
-                }
+                swerveDrive.setChassisSpeeds(speedsRobotRelative);
             },
             new PPHolonomicDriveController(
-                new PIDConstants(5.0, 0.0, 0.0),
-                new PIDConstants(0.0, 0.0, 0.0)
+                new PIDConstants(3.0, 0.0, 0.0),
+                new PIDConstants(3.0, 0.0, 0.0)
             ),
             config,
-            () -> {
-                var alliance = DriverStation.getAlliance();
-                if (alliance.isPresent())
-                {
-                    return alliance.get() == DriverStation.Alliance.Red;
-                }
-                return false;
-            },
+            () -> false, // never flip for alliance
             this
         );
         System.out.println(">>> AutoBuilder.configure DONE");
@@ -130,7 +122,7 @@ public void setupPathPlanner()
 
 
 
-private final ADXRS450_Gyro imu = new ADXRS450_Gyro();
+
 
 // in periodic:
 
@@ -146,8 +138,7 @@ public void periodic() {
     SmartDashboard.putNumber("Velocity X", swerveDrive.getRobotVelocity().vxMetersPerSecond);
     SmartDashboard.putNumber("Velocity Y", swerveDrive.getRobotVelocity().vyMetersPerSecond);
     SmartDashboard.putNumber("IMU Yaw", swerveDrive.getYaw().getDegrees());
-    SmartDashboard.putNumber("Direct IMU Yaw", imu.getAngle());
-
+  
     SmartDashboard.putNumber("Actual Speed", 
     Math.hypot(
         swerveDrive.getRobotVelocity().vxMetersPerSecond,

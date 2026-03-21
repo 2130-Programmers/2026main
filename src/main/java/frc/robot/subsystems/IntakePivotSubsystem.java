@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakePivotSubsystem extends SubsystemBase {
 
     // ── Tuning Variables ────────────────────────────────────────────────
-    public static final double PIVOT_SPEED      = 0.22;
-    public static final double MANUAL_SPEED     = 0.3; // TUNE THIS
+    public static final double PIVOT_SPEED      = 0.2;
+    public static final double MANUAL_SPEED     = 0.2; // TUNE THIS
     public static final double GEAR_RATIO       = 25.0;
 
     public static final double STABLE_THRESHOLD = 0.01;
@@ -23,6 +23,12 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
     public static final double PUSH_SPEED       = 0.1;
     public static final double PUSH_DURATION    = 0.9;
+
+    // ── Agitation Tuning ────────────────────────────────────────────────
+    public static final double AGITATE_SPEED    = 0.3;  // TUNE THIS
+    public static final double AGITATE_LOW_DEG  = 0.0;  // lower bound (degrees)
+    public static final double AGITATE_HIGH_DEG = 60.0; // upper bound (degrees)
+    public static final double AGITATE_DEADBAND = 1.0;  // degrees of tolerance at each end
     // ───────────────────────────────────────────────────────────────────
 
     private static final int LEFT_MOTOR_ID  = 16;
@@ -46,16 +52,20 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
     private boolean returnToTopAfterZero = true;
 
+    // Tracks agitation direction: true = moving toward HIGH, false = moving toward LOW
+    private boolean agitatingUp = true;
+
     public enum PivotState {
         AT_BOTTOM,
         MOVING_UP,
         AT_TOP,
         ZEROING,
-        MANUAL  // ← new
+        AGITATING,
+        MANUAL
     }
 
-    private PivotState currentState  = PivotState.AT_TOP;
-    private PivotState stateBeforeManual = PivotState.AT_TOP; // restore after manual
+    private PivotState currentState      = PivotState.AT_TOP;
+    private PivotState stateBeforeManual = PivotState.AT_TOP;
 
     @SuppressWarnings("removal")
     public IntakePivotSubsystem(double targetDegrees) {
@@ -89,9 +99,35 @@ public class IntakePivotSubsystem extends SubsystemBase {
                 break;
             case MOVING_UP:
             case ZEROING:
+            case AGITATING:
             case MANUAL:
                 break;
         }
+    }
+
+    /**
+     * Begin oscillating the pivot between AGITATE_LOW_DEG and AGITATE_HIGH_DEG.
+     * Call this from a command or button binding whenever you want agitation.
+     * The pivot will keep oscillating until you call stopAgitate() or another
+     * state transition occurs.
+     */
+    public void startAgitate() {
+        double currentDeg = getOutputRotations() * 360.0;
+        // Start by moving toward whichever bound is farther away
+        agitatingUp = (currentDeg < (AGITATE_LOW_DEG + AGITATE_HIGH_DEG) / 2.0);
+        currentState = PivotState.AGITATING;
+        System.out.println("[IntakePivot] Starting agitation. Initial direction: "
+                + (agitatingUp ? "UP" : "DOWN"));
+    }
+
+    /**
+     * Stop agitation and leave the pivot wherever it is (AT_BOTTOM is a safe
+     * resting state; caller can follow up with a toggle() to go home).
+     */
+    public void stopAgitate() {
+        stopMotors();
+        currentState = PivotState.AT_BOTTOM;
+        System.out.println("[IntakePivot] Agitation stopped.");
     }
 
     public void startZeroSequence() {
@@ -106,11 +142,10 @@ public class IntakePivotSubsystem extends SubsystemBase {
         this.targetOutputRotations = degrees / 360.0;
     }
 
-   /** Call while d-pad right is held. */
- /** Call while d-pad right is held. */
+    /** Call while d-pad right is held. */
     public void manualForward() {
         if (currentState != PivotState.MANUAL) {
-            stateBeforeManual = currentState;  // only save on first entry
+            stateBeforeManual = currentState;
             currentState      = PivotState.MANUAL;
         }
         if (getOutputRotations() * 360.0 < 93.0) {
@@ -123,7 +158,7 @@ public class IntakePivotSubsystem extends SubsystemBase {
     /** Call while d-pad left is held. */
     public void manualReverse() {
         if (currentState != PivotState.MANUAL) {
-            stateBeforeManual = currentState;  // only save on first entry
+            stateBeforeManual = currentState;
             currentState      = PivotState.MANUAL;
         }
         if (getOutputRotations() * 360.0 > 0.0) {
@@ -132,6 +167,7 @@ public class IntakePivotSubsystem extends SubsystemBase {
             stopMotors();
         }
     }
+
     /** Call on d-pad release — stops motors and restores previous state. */
     public void manualStop() {
         stopMotors();
@@ -153,6 +189,7 @@ public class IntakePivotSubsystem extends SubsystemBase {
     public void periodic() {
         double outputRotations = getOutputRotations();
         double currentPosition = encoder.getPosition();
+        double currentDeg      = outputRotations * 360.0;
 
         switch (currentState) {
 
@@ -175,6 +212,26 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
             case MANUAL:
                 // Motors driven directly by manualForward/manualReverse — nothing to do here
+                break;
+
+            case AGITATING:
+                if (agitatingUp) {
+                    // Moving toward AGITATE_HIGH_DEG
+                    if (currentDeg >= AGITATE_HIGH_DEG - AGITATE_DEADBAND) {
+                        agitatingUp = false; // flip direction
+                        System.out.println("[IntakePivot] Agitate: reversing DOWN at " + currentDeg + "°");
+                    } else {
+                        setMotors(AGITATE_SPEED);
+                    }
+                } else {
+                    // Moving toward AGITATE_LOW_DEG
+                    if (currentDeg <= AGITATE_LOW_DEG + AGITATE_DEADBAND) {
+                        agitatingUp = true; // flip direction
+                        System.out.println("[IntakePivot] Agitate: reversing UP at " + currentDeg + "°");
+                    } else {
+                        setMotors(-AGITATE_SPEED);
+                    }
+                }
                 break;
 
             case ZEROING:
@@ -221,6 +278,8 @@ public class IntakePivotSubsystem extends SubsystemBase {
         SmartDashboard.putNumber ("IntakePivot/ZeroPoint",       zeroPositionMotorRotations);
         SmartDashboard.putNumber ("IntakePivot/TargetDegrees",   targetDegrees);
         SmartDashboard.putNumber ("IntakePivot/TargetRotations", targetOutputRotations);
+        SmartDashboard.putBoolean("IntakePivot/AgitatingUp",     agitatingUp);
+        SmartDashboard.putNumber ("IntakePivot/CurrentDeg",      currentDeg);
     }
 
     // ── Private Helpers ─────────────────────────────────────────────────
@@ -233,5 +292,12 @@ public class IntakePivotSubsystem extends SubsystemBase {
     private void stopMotors() {
         leftMotor.set(0);
         rightMotor.set(0);
+    }
+
+    public void resetToTop() {
+        currentState = PivotState.AT_TOP;
+        returnToTopAfterZero = true;
+        stableTimer = 0.0;
+        pushTimer = 0.0;
     }
 }
