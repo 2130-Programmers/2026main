@@ -1,0 +1,94 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.6767760342368048,
+        "y": 7.4572753209700435
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.729775678904584,
+        "y": 7.3889490446557335
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.658159771759056,
+        "y": 6.409243937238743
+      },
+      "prevControl": {
+        "x": 8.751217423214575,
+        "y": 7.662882195337196
+      },
+      "nextControl": {
+        "x": 8.615897292713338,
+        "y": 5.839899452555283
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.25156918688031,
+        "y": 5.594108416554007
+      },
+      "prevControl": {
+        "x": 7.779533791999601,
+        "y": 5.401476276542468
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.023454157782495,
+      "rotationDegrees": -92.65899585268657
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "IntakeToggle",
+      "waypointRelativePos": 1.5503038487508225,
+      "endWaypointRelativePos": 0.7238352464551016,
+      "command": null
+    },
+    {
+      "name": "AgitatorToggle",
+      "waypointRelativePos": 1.7069547602971062,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "LauncherToggle",
+      "waypointRelativePos": 2.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

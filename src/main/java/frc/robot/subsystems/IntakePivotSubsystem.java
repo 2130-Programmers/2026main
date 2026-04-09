@@ -24,6 +24,11 @@ public class IntakePivotSubsystem extends SubsystemBase {
     public static final double PUSH_SPEED       = 0.1;
     public static final double PUSH_DURATION    = 0.9;
 
+    // How hard to actively hold the pivot down against ball pressure.
+    // Negative = pushing down. Tune until it resists balls but doesn't
+    // slam the hard stop. Start low (~0.05) and increase if it still drifts.
+    public static final double HOLD_DOWN_SPEED  = 0.08; // TUNE THIS
+
     // ── Agitation Tuning ────────────────────────────────────────────────
     public static final double AGITATE_SPEED    = 0.3;  // TUNE THIS
     public static final double AGITATE_LOW_DEG  = 0.0;  // lower bound (degrees)
@@ -54,6 +59,9 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
     // Tracks agitation direction: true = moving toward HIGH, false = moving toward LOW
     private boolean agitatingUp = true;
+
+    // Sole source of truth for hold-down. Only ever flipped by toggleHoldDown().
+    private boolean holdDownActive = false;
 
     public enum PivotState {
         AT_BOTTOM,
@@ -107,13 +115,9 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
     /**
      * Begin oscillating the pivot between AGITATE_LOW_DEG and AGITATE_HIGH_DEG.
-     * Call this from a command or button binding whenever you want agitation.
-     * The pivot will keep oscillating until you call stopAgitate() or another
-     * state transition occurs.
      */
     public void startAgitate() {
         double currentDeg = getOutputRotations() * 360.0;
-        // Start by moving toward whichever bound is farther away
         agitatingUp = (currentDeg < (AGITATE_LOW_DEG + AGITATE_HIGH_DEG) / 2.0);
         currentState = PivotState.AGITATING;
         System.out.println("[IntakePivot] Starting agitation. Initial direction: "
@@ -121,8 +125,7 @@ public class IntakePivotSubsystem extends SubsystemBase {
     }
 
     /**
-     * Stop agitation and leave the pivot wherever it is (AT_BOTTOM is a safe
-     * resting state; caller can follow up with a toggle() to go home).
+     * Stop agitation and rest at AT_BOTTOM.
      */
     public void stopAgitate() {
         stopMotors();
@@ -174,6 +177,17 @@ public class IntakePivotSubsystem extends SubsystemBase {
         currentState = stateBeforeManual;
     }
 
+    /**
+     * Toggles active hold-down on/off. This is the ONLY way hold-down turns on.
+     * Bind in RobotContainer with NO subsystem requirement to avoid conflicts:
+     *   button.onTrue(new InstantCommand(pivot::toggleHoldDown))
+     */
+    public void toggleHoldDown() {
+        holdDownActive = !holdDownActive;
+        System.out.println("[IntakePivot] HoldDown: " + (holdDownActive ? "ON" : "OFF"));
+    }
+
+    public boolean isHoldDownActive() { return holdDownActive; }
     public PivotState getState()      { return currentState; }
     public boolean isZeroed()         { return isZeroed; }
     public double getMotorRotations() { return encoder.getPosition(); }
@@ -194,7 +208,13 @@ public class IntakePivotSubsystem extends SubsystemBase {
         switch (currentState) {
 
             case AT_BOTTOM:
-                stopMotors();
+                // Hold-down is entirely controlled by toggleHoldDown().
+                // When active, resist ball pressure. When inactive, just brake.
+                if (holdDownActive && currentDeg > 1.0) {
+                    setMotors(-HOLD_DOWN_SPEED);
+                } else {
+                    stopMotors();
+                }
                 break;
 
             case MOVING_UP:
@@ -216,17 +236,15 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
             case AGITATING:
                 if (agitatingUp) {
-                    // Moving toward AGITATE_HIGH_DEG
                     if (currentDeg >= AGITATE_HIGH_DEG - AGITATE_DEADBAND) {
-                        agitatingUp = false; // flip direction
+                        agitatingUp = false;
                         System.out.println("[IntakePivot] Agitate: reversing DOWN at " + currentDeg + "°");
                     } else {
                         setMotors(AGITATE_SPEED);
                     }
                 } else {
-                    // Moving toward AGITATE_LOW_DEG
                     if (currentDeg <= AGITATE_LOW_DEG + AGITATE_DEADBAND) {
-                        agitatingUp = true; // flip direction
+                        agitatingUp = true;
                         System.out.println("[IntakePivot] Agitate: reversing UP at " + currentDeg + "°");
                     } else {
                         setMotors(-AGITATE_SPEED);
@@ -280,6 +298,7 @@ public class IntakePivotSubsystem extends SubsystemBase {
         SmartDashboard.putNumber ("IntakePivot/TargetRotations", targetOutputRotations);
         SmartDashboard.putBoolean("IntakePivot/AgitatingUp",     agitatingUp);
         SmartDashboard.putNumber ("IntakePivot/CurrentDeg",      currentDeg);
+        SmartDashboard.putBoolean("IntakePivot/HoldDownActive",  holdDownActive);
     }
 
     // ── Private Helpers ─────────────────────────────────────────────────

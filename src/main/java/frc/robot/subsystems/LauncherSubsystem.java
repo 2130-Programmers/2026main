@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LauncherSubsystem extends SubsystemBase {
@@ -19,7 +20,7 @@ public class LauncherSubsystem extends SubsystemBase {
     // ── Side balance correction ──────────────────────────────────────────
     // Right side is stronger — reduce it until both sides feel equal.
     // 1.0 = no correction, 0.9 = right runs at 90% of left
-    public static final double RIGHT_TRIM = 0.942;
+    public static final double RIGHT_TRIM = 0.957;
 
     // ── Speed scaling ────────────────────────────────────────────────────
     public static final double SPEED_PER_FOOT    = 0.01;
@@ -42,7 +43,7 @@ public class LauncherSubsystem extends SubsystemBase {
     public static final double CLOSE_RANGE_THRESHOLD = BASELINE_DIST_FT; // feet
     public static final double CLOSE_CURVE_STRENGTH  = 0.05; // tune this (higher = more aggressive dip)
     // Overall scalar on the close-range correction: 0.0 = no correction, 1.0 = full, >1.0 = extra aggressive
-    public static final double CLOSE_CORRECTION_SCALE = 0.12;
+    public static final double CLOSE_CORRECTION_SCALE = 0.005;
 
     private static final int TOP_MOTOR_ID     = 13;
     private static final int TOP_MOTOR_ID2    = 14;
@@ -162,5 +163,25 @@ public class LauncherSubsystem extends SubsystemBase {
             bottomMotor.set(speed * ratio * RIGHT_TRIM * -1);
             bottomMotor2.set(speed * ratio);
         }
+        
     }
+    public class LaunchMaxToggleCommand extends InstantCommand {
+    private boolean isMaxMode = false;
+
+    public LaunchMaxToggleCommand() {
+        addRequirements(LauncherSubsystem.this);
+    }
+
+    @Override
+    public void initialize() {
+        isMaxMode = !isMaxMode;
+        if (isMaxMode) {
+            setDistance(MAX_DIST_FT);
+            start();
+        } else {
+            setDistance(BASELINE_DIST_FT);
+            stop();
+        }
+    }
+}
 }

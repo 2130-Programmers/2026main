@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class AgitatorSubsystem extends SubsystemBase {
 
     // ── Top-level tuning variables ──────────────────────────────────────
-    public static final double Agitator_SPEED = .150; // 0.0 to 1.0
+    public static final double Agitator_SPEED = .250; // 0.0 to 1.0
     
     // ───────────────────────────────────────────────────────────────────
 

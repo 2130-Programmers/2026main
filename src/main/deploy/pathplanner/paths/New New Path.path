@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6195292439372322,
-        "y": 3.756818830242511
+        "x": -0.69,
+        "y": 1.5
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.619529243937232,
-        "y": 3.756818830242511
+        "x": -0.25029957203994313,
+        "y": 2.2119215406562063
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.874579172610556,
-        "y": 3.756818830242511
+        "x": 1.3219400855920111,
+        "y": 2.3076890156918695
       },
       "prevControl": {
-        "x": 1.8745791726105558,
-        "y": 3.756818830242511
+        "x": 0.9855349500713264,
+        "y": 1.816019971469331
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,44 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "LauncherToggle",
+      "waypointRelativePos": 0.9939230249831197,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "LauncherToggle"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "AgitatorToggle"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "IntakeToggle"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "PivotToggle"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -42,7 +79,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -150.01836063115059
   },
   "reversed": false,
   "folder": null,

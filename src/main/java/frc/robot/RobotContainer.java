@@ -1,17 +1,9 @@
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.AgitatorSubsystem;
-import frc.robot.subsystems.IntakePivotSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.LauncherSubsystem;
-import frc.robot.subsystems.TargetLockSubsystem;
+import org.photonvision.PhotonCamera;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
-import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,6 +12,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.AgitatorSubsystem;
+import frc.robot.subsystems.IntakePivotSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.TargetLockSubsystem;
 
 public class RobotContainer {
 
@@ -49,8 +48,18 @@ public class RobotContainer {
 
         // ── PathPlanner named commands ────────────────────────────────────────
         NamedCommands.registerCommand("PivotToggle",      new InstantCommand(pivot::toggle, pivot));
-        NamedCommands.registerCommand("IntakeToggle",     new InstantCommand(intake::toggle, intake));
+        NamedCommands.registerCommand("IntakeToggle",
+            new InstantCommand(() -> {
+                intake.toggle();
+                pivot.toggleHoldDown();
+            }, intake) 
+        );
         NamedCommands.registerCommand("LauncherToggle",   new InstantCommand(launcher::toggle, launcher));
+
+        NamedCommands.registerCommand("ZeroGyro",   new InstantCommand(swerve::zeroGyro));
+
+
+
         NamedCommands.registerCommand("TargetLockToggle", new InstantCommand(targetLock::toggleLock));
         NamedCommands.registerCommand("AgitatorToggle",   new InstantCommand(agitator::toggle, agitator));
         NamedCommands.registerCommand("SetTargetDegrees",  new InstantCommand(() -> { pivot.setTargetDegrees(60); pivot.toggle(); }, pivot));
@@ -59,6 +68,9 @@ public class RobotContainer {
                 .withTimeout(5.0)
                 .finallyDo((interrupted) -> pivot.stopAgitate())
         );
+          NamedCommands.registerCommand("LauncherTarget", new InstantCommand(targetLock::toggleLock));
+        
+        
 
         launcher.setTargetLock(targetLock);
 
@@ -67,8 +79,8 @@ public class RobotContainer {
         // ── Default drive command ─────────────────────────────────────────────
         swerve.setDefaultCommand(
             new RunCommand(() -> {
-                double xSpeed = -m_driverController.getLeftY();
-                double ySpeed = -m_driverController.getLeftX();
+                double xSpeed = m_driverController.getLeftY();
+                double ySpeed = m_driverController.getLeftX();
                 double rot    = -m_driverController.getRightX();
 
                 // Deadbands
@@ -96,6 +108,7 @@ public class RobotContainer {
         drivingModeChooser.addOption("Field Oriented", true);
         SmartDashboard.putData("Driving Mode",  drivingModeChooser);
 
+        SmartDashboard.putBoolean("Intake",  intake.isRunning);
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Selector", autoChooser);
 
@@ -150,7 +163,10 @@ public class RobotContainer {
          // D-pad UP held: pivot manual forward
          m_driverController.povUp()
             .onTrue(new InstantCommand(agitator::toggle, agitator));
-
+         m_driverController.rightBumper()
+            .onTrue(new InstantCommand(swerve::zeroGyro));
+         m_driverController.leftBumper()
+            .onTrue(new InstantCommand(intake::dumpToggle));
         // D-pad right held: pivot manual forward
         m_driverController.povRight()
             .whileTrue(new RunCommand(pivot::manualForward, pivot))
@@ -160,9 +176,15 @@ public class RobotContainer {
         m_driverController.povLeft()
             .whileTrue(new RunCommand(pivot::manualReverse, pivot))
             .onFalse(new InstantCommand(pivot::manualStop, pivot));
-
+       
+        m_driverController.povDown()
+                .onTrue(launcher.new LaunchMaxToggleCommand());
         // B button: intake toggle
-        m_driverController.b().onTrue(new InstantCommand(intake::toggle, intake));
+        // B button: intake toggle + hold down toggle
+        // B button: intake toggle + hold-down toggle
+        m_driverController.b()
+            .onTrue(new InstantCommand(intake::toggle, intake))
+            .onTrue(new InstantCommand(pivot::toggleHoldDown)); // NO subsystem requirement — won't conflict
 
         // X button: launcher toggle
         m_driverController.x()
@@ -180,6 +202,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
+
 
     public SwerveSubsystem getSwerve() {
         return swerve;

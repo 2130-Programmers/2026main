@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.7155920114122676,
-        "y": 3.950898716119829
+        "x": 3.650898716119829,
+        "y": 4.028530670470756
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.005289208162483,
-        "y": 3.950898716119829
+        "x": 2.622418277082235,
+        "y": 4.18200563923301
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.189,
-        "y": 3.950898716119829
+        "x": 1.8912410841654772,
+        "y": 4.028530670470756
       },
       "prevControl": {
-        "x": 2.6684292620108288,
-        "y": 3.950898716119829
+        "x": 1.646518497167169,
+        "y": 3.9774341401300823
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,51 +33,22 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "PivotToggle",
-      "waypointRelativePos": 0.0,
+      "name": "AgitatorToggle",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "LauncherTarget",
-      "waypointRelativePos": 0.9831195138419987,
+      "name": "",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "LauncherTarget"
-        }
-      }
+      "command": null
     },
     {
       "name": "LauncherToggle",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "IntakeToggle"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "PivotToggle"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "LauncherToggle"
-              }
-            }
-          ]
-        }
-      }
+      "command": null
     }
   ],
   "globalConstraints": {
@@ -96,7 +67,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.182
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

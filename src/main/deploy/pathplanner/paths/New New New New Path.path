@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.7155920114122676,
-        "y": 3.950898716119829
+        "x": 3.780285306704707,
+        "y": 3.8732667617689023
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.005289208162483,
-        "y": 3.950898716119829
+        "x": 2.780285306704707,
+        "y": 3.8732667617689023
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.189,
-        "y": 3.950898716119829
+        "x": 1.6583452211126959,
+        "y": 3.8732667617689023
       },
       "prevControl": {
-        "x": 2.6684292620108288,
-        "y": 3.950898716119829
+        "x": 2.658345221112696,
+        "y": 3.8732667617689023
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,18 +34,12 @@
   "eventMarkers": [
     {
       "name": "PivotToggle",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "LauncherTarget",
-      "waypointRelativePos": 0.9831195138419987,
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "LauncherTarget"
+          "name": "PivotToggle"
         }
       }
     },
@@ -60,19 +54,31 @@
             {
               "type": "named",
               "data": {
+                "name": "LauncherTarget"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
                 "name": "IntakeToggle"
               }
             },
             {
               "type": "named",
               "data": {
-                "name": "PivotToggle"
+                "name": "AgitatorToggle"
               }
             },
             {
               "type": "named",
               "data": {
                 "name": "LauncherToggle"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "PivotToggle"
               }
             }
           ]
@@ -96,7 +102,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.182
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

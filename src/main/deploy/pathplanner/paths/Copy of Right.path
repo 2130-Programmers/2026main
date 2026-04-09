@@ -1,0 +1,226 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.6767760342368048,
+        "y": 4.028530670470756
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.418002853067047,
+        "y": 2.7476034236804563
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.6767760342368048,
+        "y": 0.34101283880171307
+      },
+      "prevControl": {
+        "x": 2.654621968616262,
+        "y": 0.3410128388017132
+      },
+      "nextControl": {
+        "x": 4.7577543456093805,
+        "y": 0.34101283880171307
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.998288159771754,
+        "y": 1.4019828815961273
+      },
+      "prevControl": {
+        "x": 7.826662057879547,
+        "y": 0.26300965994593106
+      },
+      "nextControl": {
+        "x": 8.14061340941512,
+        "y": 2.3465049928673327
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.885563480741797,
+        "y": 1.6866333808844511
+      },
+      "prevControl": {
+        "x": 7.925217623702328,
+        "y": 5.784093826670046
+      },
+      "nextControl": {
+        "x": 6.665606276747502,
+        "y": 0.819743223965763
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.608359486447931,
+        "y": 0.44
+      },
+      "prevControl": {
+        "x": 5.88180255230569,
+        "y": 0.4385787465775864
+      },
+      "nextControl": {
+        "x": 3.1592296718962487,
+        "y": 0.44161733238310613
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.477,
+        "y": 1.402
+      },
+      "prevControl": {
+        "x": 2.162748930097778,
+        "y": 0.8715149786035881
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.407249466950948,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 2.004264392324103,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 3.6140724946695353,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 4.189765458422165,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 2.1019581363943374,
+      "maxWaypointRelativePos": 3.1,
+      "constraints": {
+        "maxVelocity": 1.25,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.6475354490209217,
+      "maxWaypointRelativePos": 2.093180283592201,
+      "constraints": {
+        "maxVelocity": 2.75,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "PivotToggle",
+      "waypointRelativePos": 0.6347062795408452,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "PivotToggle"
+        }
+      }
+    },
+    {
+      "name": "IntakeToggle",
+      "waypointRelativePos": 1.863605671843342,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "IntakeToggle"
+        }
+      }
+    },
+    {
+      "name": "LauncherTarget",
+      "waypointRelativePos": 4.99,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "LauncherTarget"
+        }
+      }
+    },
+    {
+      "name": "LauncherToggle",
+      "waypointRelativePos": 5.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "AgitatorToggle"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "LauncherToggle"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "PivotToggle"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -126.254
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

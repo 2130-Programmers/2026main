@@ -3,73 +3,89 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6767760342368048,
-        "y": 4.067346647646221
+        "x": 3.713144578313253,
+        "y": 4.013144578313253
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.640106069189239,
-        "y": 2.774902064607809
+        "x": 3.2978915662650605,
+        "y": 3.0187228915662647
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.952,
-        "y": 0.44452211126961516
-      },
-      "prevControl": {
-        "x": 1.940653554754182,
-        "y": 0.5919320806360422
-      },
-      "nextControl": {
-        "x": 3.3972928258256867,
-        "y": 0.37961794106896773
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.974951807232728,
+        "x": 3.035626506024096,
         "y": 0.6364819277108438
       },
       "prevControl": {
-        "x": 7.999398450078841,
-        "y": 0.2743375164601772
+        "x": 2.7418752601574923,
+        "y": 0.8432811311029172
       },
       "nextControl": {
-        "x": 7.920656205428866,
-        "y": 1.4407988587730551
+        "x": 3.3133624378173145,
+        "y": 0.44095741417643997
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.778330955785499,
-        "y": 4.067346647646221
+        "x": 7.7265763195435095,
+        "y": 0.8197432239657632
       },
       "prevControl": {
-        "x": 7.750066947084689,
-        "y": 4.315743801036031
+        "x": 7.700851531772134,
+        "y": 0.5710702755091253
       },
       "nextControl": {
-        "x": 8.451141226826868,
-        "y": -1.8456205420827363
+        "x": 7.804208273894435,
+        "y": 1.5701854493580605
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.2313694721825963,
+        "x": 7.7265763195435095,
+        "y": 3.4074750356633388
+      },
+      "prevControl": {
+        "x": 7.705048081708356,
+        "y": 3.0271822867843348
+      },
+      "nextControl": {
+        "x": 7.748104557378662,
+        "y": 3.7877677845423428
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.384679029957203,
+        "y": 0.4315834522111266
+      },
+      "prevControl": {
+        "x": 6.937318116975748,
+        "y": 0.5501514531736065
+      },
+      "nextControl": {
+        "x": 3.7409334161007646,
+        "y": 0.3060580592493596
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.6195292439372322,
         "y": 1.6348787446505004
       },
       "prevControl": {
-        "x": 0.2480313837375161,
-        "y": 1.052639087018545
+        "x": 1.5359537401612329,
+        "y": 1.3600254262610143
       },
       "nextControl": null,
       "isLocked": false,
@@ -82,23 +98,15 @@
       "rotationDegrees": -5.303397546821747
     },
     {
-      "waypointRelativePos": 1.5095948827291994,
-      "rotationDegrees": 0.0
-    },
-    {
       "waypointRelativePos": 1.906183368869911,
       "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 3.2153518123667055,
-      "rotationDegrees": 90.0
+      "waypointRelativePos": 3.6780383795309133,
+      "rotationDegrees": 4.270824201721521
     },
     {
-      "waypointRelativePos": 3.3688699360340992,
-      "rotationDegrees": -1.4689757111726274
-    },
-    {
-      "waypointRelativePos": 3.5735607675906103,
+      "waypointRelativePos": 4.466950959488224,
       "rotationDegrees": -1.109012633464682
     }
   ],
@@ -129,44 +137,19 @@
     },
     {
       "name": "LauncherToggle",
-      "waypointRelativePos": 4.0,
+      "waypointRelativePos": 5.0,
       "endWaypointRelativePos": null,
       "command": {
-        "type": "parallel",
+        "type": "named",
         "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "LauncherToggle"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "AgitatorToggle"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "PivotAgitate"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 5.0
-              }
-            }
-          ]
+          "name": "LauncherToggle"
         }
       }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.25,
-    "maxAcceleration": 2.25,
+    "maxVelocity": 4.5,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -174,7 +157,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -139.89909245378774
+    "rotation": -140.44033203100545
   },
   "reversed": false,
   "folder": null,
