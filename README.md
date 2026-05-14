@@ -24,6 +24,10 @@ This repository contains the full robot control code for Team 2130's 2026 compet
 
 ---
 
+## CAD Files
+
+Here is the google drive link to the SolidWorks Assembly Of File Explorer https://drive.google.com/file/d/16M2vMvo7n1WblnARNBPhV3Jx4Lu4pAZf/view?usp=sharing
+
 ## Subsystems
 
 | Subsystem | Class | Description |
