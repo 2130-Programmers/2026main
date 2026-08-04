@@ -26,7 +26,7 @@ Built with **WPILib** command-based Java, **YAGSL** swerve drive, **PathPlanner*
 - **Agitator** — Feeds balls into the launcher
 - **Target Lock** — PhotonVision AprilTag alignment
 
-## Controls (Xbox Controller)
+## Controls (Xbox Controller) (Port 0)
 
 | Input | Action |
 |---|---|
