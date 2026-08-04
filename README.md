@@ -11,16 +11,16 @@ d88P"        888   888    888 888    888
                 TEAM ALPHA 2130
 ```
 
-# Alpha 2130 — 2026 FRC Robot Code
+# Alpha 2130 — 2026 Robot Code
 
-Robot code for **Team 2130** (FIRST Robotics Competition 2026).
+This is the code for Alpha 2130's Robot File Explorer
 
 Built with **WPILib** command-based Java, **YAGSL** swerve drive, **PathPlanner** autos, and **PhotonVision** for AprilTag targeting.
 
 ## Subsystems
 
-- **Swerve Drive** — YAGSL swerve drivetrain
-- **Launcher** — Dual-motor ball shooter
+- **Swerve Drive** — Swerve drivetrain
+- **Launcher** — Dual Stationary Shooters
 - **Intake** — Intake roller with dump mode
 - **Intake Pivot** — Pivot arm with position control
 - **Agitator** — Feeds balls into the launcher
@@ -30,15 +30,15 @@ Built with **WPILib** command-based Java, **YAGSL** swerve drive, **PathPlanner*
 
 | Input | Action |
 |---|---|
-| Left stick | Drive (translate) |
+| Left stick | Move In Cardinal Directions |
 | Right stick X | Rotate |
-| A | Pivot toggle (94.5°) |
-| B | Intake + pivot hold-down |
-| X | Launcher, agitator, and intake |
+| A | Move Intake Down From Up Postion |
+| B | Intake |
+| X | Main Shoot Button (Toggles Launcher-Agitator-Intake) |
 | Y | AprilTag target lock |
 | D-pad Up | Agitator toggle |
 | D-pad Down | Launcher max speed |
-| D-pad Left / Right (held) | Pivot manual |
+| D-pad Left / Right | Pivot manual (Feather It Up And Down While Shooting) |
 | Left bumper | Intake dump |
 | Right bumper | Zero gyro |
 
