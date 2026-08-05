@@ -42,14 +42,15 @@ Built with **WPILib** command-based Java, **YAGSL** swerve drive, **PathPlanner*
 | Left bumper | Intake dump |
 | Right bumper | Zero gyro |
 
-## Build & Deploy
+## Tips For People That Dont Know What They're Doing
 
-Requires [WPILib 2026](https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html).
+| #1 Turn On Bot With Main Breaker
+| #2 Connect To Robots Wifi Network (Password robo2130)
+| #3 Open Driver Station (Smart Dashboard Will Open Automatically)
+| #4 Make Sure Controller Is Plugged In And Port 0 In USB Panel
+| #5 Ensure Team Number is 2130 For File Explorer and 21301 For Kit Bot In Second Tab
 
-```bash
-./gradlew build    # compile
-./gradlew deploy   # deploy to RoboRIO
-```
+
 
 Select autonomous routines from the **Auto Selector** on SmartDashboard.
 
