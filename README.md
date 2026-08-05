@@ -44,11 +44,11 @@ Built with **WPILib** command-based Java, **YAGSL** swerve drive, **PathPlanner*
 
 ## Tips For People That Dont Know What They're Doing
 
-| #1 Turn On Bot With Main Breaker
-| #2 Connect To Robots Wifi Network (Password robo2130)
-| #3 Open Driver Station (Smart Dashboard Will Open Automatically)
-| #4 Make Sure Controller Is Plugged In And Port 0 In USB Panel
-| #5 Ensure Team Number is 2130 For File Explorer and 21301 For Kit Bot In Second Tab
+- **Turn On Bot With Main Breaker
+- **Connect To Robots Wifi Network (Password robo2130)
+- **Open Driver Station (Smart Dashboard Will Open Automatically)
+- **Make Sure Controller Is Plugged In And Port 0 In USB Panel
+- **Ensure Team Number is 2130 For File Explorer and 21301 For Kit Bot In Second Tab
 
 
 
