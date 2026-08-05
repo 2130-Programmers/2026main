@@ -49,6 +49,8 @@ Built with **WPILib** command-based Java, **YAGSL** swerve drive, **PathPlanner*
 - #3 Open Driver Station (Smart Dashboard Will Open Automatically)
 - #4 Make Sure Controller Is Plugged In And Port 0 In USB Panel
 - #5 Ensure Team Number is 2130 For File Explorer and 21301 For Kit Bot In Second Tab
+- Click ENABLE To Start Driving The Bot (Light Will Start Blinking)
+- Press Space To Emergency Stop (You Will Have To Reset The Bot
 
 
 
